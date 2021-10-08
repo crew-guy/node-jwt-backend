@@ -60,7 +60,9 @@ router.post("/signup", [
     res.status(200).json({
         token,
         _id: slug,
-        email
+        email,
+        name,
+        password
     })
 })
 
@@ -100,7 +102,9 @@ router.post('/login', async (req, res) => {
     res.json({
         token,
         _id: user.slug,
-        email:user.email
+        email: user.email,
+        name: user.name,
+        password:user.password
     })
 })
 
