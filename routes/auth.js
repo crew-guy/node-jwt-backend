@@ -3,6 +3,7 @@ const { check, validationResult } = require("express-validator");
 const JWT = require("jsonwebtoken")
 const bcrypt = require('bcrypt');
 const { users } = require("../db")
+const User = require('../models/User')
 
 // SIGNUP
 router.post("/signup", [
@@ -11,7 +12,7 @@ router.post("/signup", [
     check("password", "Please input a password with a min length of 6")
         .isLength({min: 6})
 ], async (req, res) => {
-    const { email, password } = req.body;
+    const { name,email, password } = req.body;
 
     // Validate the inputs 
     const errors = validationResult(req);
@@ -21,11 +22,12 @@ router.post("/signup", [
             errors: errors.array()
         })
     }
+    
 
     // Validate if the user doesnt already exist;
-    let user = users.find((user) => {
-        return user.email === email
-    });
+    let user = await User.findOne({ email: email })
+    
+    console.log(user)
 
     if(user) {
         return res.status(400).json({
@@ -41,9 +43,14 @@ router.post("/signup", [
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Save the password into the db
-    users.push({
+    const userInDb = new User({
+        name, 
         email,
-        password: hashedPassword
+        password :hashedPassword
+    });
+    await userInDb.save(function (err) {
+        if (err) return console.log(err)
+    // saved!
     });
 
     const token = await JWT.sign({ email }, process.env.SECRET, {expiresIn: 360000});
@@ -58,9 +65,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body
     // Check if user with email exists
 
-    let user = users.find((user) => {
-        return user.email === email
-    });
+    let user = await User.findOne({email:email})
 
     if(!user){
         return res.status(400).json({
@@ -71,6 +76,8 @@ router.post('/login', async (req, res) => {
             ]
         })
     }
+
+    console.log(password, user.password)
 
     // Check if the password if valid
     let isMatch = await bcrypt.compare(password, user.password);

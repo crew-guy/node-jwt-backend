@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const linkSchema = new Schema({
@@ -7,3 +7,4 @@ const linkSchema = new Schema({
   numOfClicks: Number,
   authorId:String
 });
+
