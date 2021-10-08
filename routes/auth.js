@@ -14,7 +14,9 @@ router.post("/signup", [
 ], async (req, res) => {
     const { name,email, password,slug } = req.body;
 
-    // Validate the inputs 
+    console.log(name,email)
+
+    // Validate the inputs
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -55,8 +57,10 @@ router.post("/signup", [
 
     const token = await JWT.sign({ email }, process.env.SECRET, {expiresIn: 36000000000000000});
 
-    res.json({
-        token
+    res.status(200).json({
+        token,
+        _id: slug,
+        email
     })
 })
 
@@ -94,7 +98,9 @@ router.post('/login', async (req, res) => {
     const token = await JWT.sign({email}, process.env.SECRET, {expiresIn: 36000000000000000})
 
     res.json({
-        token
+        token,
+        _id: user.slug,
+        email:user.email
     })
 })
 
