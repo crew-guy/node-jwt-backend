@@ -93,17 +93,11 @@ router.post('/login', async (req, res) => {
     }
 
     // Send JSON WEB TOKEN
-    const token = await JWT.sign({email}, "process.env.SECRET", {expiresIn: 360000})
+    const token = await JWT.sign({email}, process.env.SECRET, {expiresIn: 360000})
 
     res.json({
         token
     })
-})
-
-
-// ALL USER
-router.get("/all", (req, res) => {
-    res.json(users)
 })
 
 module.exports = router
