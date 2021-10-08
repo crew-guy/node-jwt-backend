@@ -12,7 +12,7 @@ router.post("/signup", [
     check("password", "Please input a password with a min length of 6")
         .isLength({min: 6})
 ], async (req, res) => {
-    const { name,email, password } = req.body;
+    const { name,email, password,slug } = req.body;
 
     // Validate the inputs 
     const errors = validationResult(req);
@@ -27,8 +27,6 @@ router.post("/signup", [
     // Validate if the user doesnt already exist;
     let user = await User.findOne({ email: email })
     
-    console.log(user)
-
     if(user) {
         return res.status(400).json({
             errors: [
@@ -46,14 +44,16 @@ router.post("/signup", [
     const userInDb = new User({
         name, 
         email,
-        password :hashedPassword
+        password: hashedPassword,
+        slug,
+        bio:""
     });
     await userInDb.save(function (err) {
         if (err) return console.log(err)
     // saved!
     });
 
-    const token = await JWT.sign({ email }, process.env.SECRET, {expiresIn: 360000});
+    const token = await JWT.sign({ email }, process.env.SECRET, {expiresIn: 36000000000000000});
 
     res.json({
         token
@@ -77,8 +77,6 @@ router.post('/login', async (req, res) => {
         })
     }
 
-    console.log(password, user.password)
-
     // Check if the password if valid
     let isMatch = await bcrypt.compare(password, user.password);
 
@@ -93,7 +91,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Send JSON WEB TOKEN
-    const token = await JWT.sign({email}, process.env.SECRET, {expiresIn: 360000})
+    const token = await JWT.sign({email}, process.env.SECRET, {expiresIn: 36000000000000000})
 
     res.json({
         token

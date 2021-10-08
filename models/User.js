@@ -5,6 +5,8 @@ const userSchema = new Schema({
   name:  String, // String is shorthand for {type: String}
   email: String,
   password: String,
+  slug:String,
+  bio:String
 });
 
 const User = mongoose.model('user',userSchema);

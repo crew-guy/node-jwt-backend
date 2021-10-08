@@ -1,11 +1,7 @@
 const router = require("express").Router();
-const { links  } = require("../db");
 const checkAuth = require("../middleware/checkAuth");
 const Link = require('../models/Link')
-
-router.get('/',checkAuth, async(req, res) => {
-    res.json(links)
-})
+const User = require('../models/User')
 
 router.post('/', checkAuth, async (req, res) => {
     const {
@@ -23,14 +19,26 @@ router.post('/', checkAuth, async (req, res) => {
 
     await link.save(function (err) {
         if (err) return console.log(err)
-    // saved!
     });
 
     return res.json(link)
 })
 
-// router.get('/', async (req, res) => {
+router.get('/:slug', async (req, res) => {
+    const { slug } = req.params
     
-// })
+    const user = await User.findOne({ slug: slug })
+    const userEmail = user.email
+
+    const links = await Link.find({ authorEmailId: userEmail})
+    
+    if (!links) {
+        return res.status(400).json({
+            msg :"URL is wrong"
+        })
+    }
+
+    return res.json(links)
+})
 
 module.exports = router
